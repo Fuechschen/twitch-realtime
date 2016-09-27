@@ -1,0 +1,10 @@
+{
+  "name": "twitch-realtime",
+  "version": "0.0.1",
+  "main": "main.js",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "shortid": "^2.2.6",
+    "ws": "^1.1.1"
+  }
+}
