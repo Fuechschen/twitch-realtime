@@ -21,7 +21,7 @@ class TwitchPubSub extends EventEmitter {
     }
 
     _connect() {
-        if (this._ws && (this._ws.readyState === WebSocket.CONNECTED || this._ws.readyState === WebSocket.CONNECTING))return;
+        if (this._ws && (this._ws.readyState === WebSocket.OPEN || this._ws.readyState === WebSocket.CONNECTING))return;
         else {
             this._ws = new WebSocket(URL);
 
