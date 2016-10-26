@@ -48,7 +48,7 @@ class TwitchPubSub extends EventEmitter {
             this._ws.on('message', (msg)=> {
                 try {
                     msg = JSON.parse(msg);
-                    this.emit('raw',msg);
+                    this.emit('raw', msg);
                     if (msg.type === 'RESPONSE') {
                         if (msg.nonce === this._initial) {
                             this._initial = null;
@@ -66,13 +66,13 @@ class TwitchPubSub extends EventEmitter {
                         var channel = split[1];
                         if (topic === 'video-playback') {
                             if (msg.data.message.type === 'stream-up') {
-                                this.emit('stram-up', {
+                                this.emit('stream-up', {
                                     time: msg.data.message.server_time,
                                     channel,
                                     play_delay: msg.data.message.play_delay
                                 });
                             } else if (msg.data.message.type === 'stream-down') {
-                                this.emit('stream-up', {
+                                this.emit('stream-down', {
                                     time: msg.data.message.server_time,
                                     channel
                                 });
@@ -182,7 +182,7 @@ class TwitchPubSub extends EventEmitter {
     }
 
     static topic(type, channel) {
-        return `${TwitchPubSub.TOPICS[type]}.${channel}`;
+        return `${type}.${channel}`;
     }
 }
 
