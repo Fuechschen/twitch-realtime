@@ -1,7 +1,26 @@
 {
   "name": "twitch-realtime",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "main.js",
+  "description": "A small library to use the Twitch PubSub API",
+  "author":"Johannes Diehl <me@fuechschen.org> (https://fuechschen.org)",
+  "keywords": [
+    "twitch",
+    "realtime",
+    "pubsub"
+  ],
+  "license": "MIT",
+  "files": [
+    "main.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fuechschen/twitch-realtime.git"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "bugs":"https://github.com/Fuechschen/twitch-realtime/issues",
   "dependencies": {
     "bluebird": "^3.4.6",
     "shortid": "^2.2.6",
