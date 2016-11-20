@@ -25,7 +25,7 @@ class TwitchPubSub extends EventEmitter {
         else {
             this._ws = new WebSocket(URL);
 
-            this._ws.on('open', ()=> {
+            this._ws.on('open', () => {
                 this._initial = shortid.generate();
                 this._ws.send(JSON.stringify({
                     type: 'LISTEN',
@@ -35,9 +35,9 @@ class TwitchPubSub extends EventEmitter {
                 this.emit('connect');
             });
 
-            this._ws.on('close', ()=> {
+            this._ws.on('close', () => {
                 if (this._autoreconnect) {
-                    setTimeout(()=> {
+                    setTimeout(() => {
                         this._ws = new WebSocket(URL);
                     }, 1000 * this._tries);
                     this._tries++;
@@ -45,17 +45,17 @@ class TwitchPubSub extends EventEmitter {
                 this.emit('close', this._autoreconnect);
             });
 
-            this._ws.on('message', (msg)=> {
+            this._ws.on('message', (msg) => {
                 try {
                     msg = JSON.parse(msg);
-                    this.emit('raw',msg);
+                    this.emit('raw', msg);
                     if (msg.type === 'RESPONSE') {
                         if (msg.nonce === this._initial) {
                             this._initial = null;
-                            if (msg.error !== "")this.emit('error', 'Error while subscribing to initial topics', msg.error);
+                            if (msg.error !== "") this.emit('error', 'Error while subscribing to initial topics', msg.error);
                         } else {
                             if (this._pending[msg.nonce]) {
-                                if (msg.error !== "")this._pending[msg.nonce].reject(msg.error);
+                                if (msg.error !== "") this._pending[msg.nonce].reject(msg.error);
                                 else this._pending[msg.nonce].resolve();
                                 delete this._pending[msg.nonce];
                             } else this.emit('warn', 'Received message for unknown nonce.');
@@ -64,9 +64,10 @@ class TwitchPubSub extends EventEmitter {
                         var split = msg.data.topic.split('.');
                         var topic = split[0];
                         var channel = split[1];
+                        if (typeof msg.data.message === 'string') msg.data.message=JSON.parse(msg.data.message);
                         if (topic === 'video-playback') {
                             if (msg.data.message.type === 'stream-up') {
-                                this.emit('stram-up', {
+                                this.emit('stream-up', {
                                     time: msg.data.message.server_time,
                                     channel,
                                     play_delay: msg.data.message.play_delay
@@ -83,12 +84,11 @@ class TwitchPubSub extends EventEmitter {
                                     viewers: msg.data.message.viewers
                                 });
                             }
-                        } else if (topic === 'whispers') {
+                        } else if (topic.includes('whispers')) {
                             //todo
                         }
-                        this.emit(msg.data.message.type, {})
-                    } else if (msg.type === 'PING')this._ws.send(JSON.stringify({type: 'PONG'}));
-                    else if (msg.type === 'RECONNECT')this._reconnect();
+                    } else if (msg.type === 'PING') this._ws.send(JSON.stringify({type: 'PONG'}));
+                    else if (msg.type === 'RECONNECT') this._reconnect();
                     else this.emit('warn', 'Received unknown message type. Maybe this package is outdated?');
                 } catch (e) {
                     this.emit('debug', e);
@@ -101,21 +101,21 @@ class TwitchPubSub extends EventEmitter {
 
     _reconnect(timeout) {
         this._ws.terminate();
-        setTimeout(()=> {
+        setTimeout(() => {
             this._connect();
         }, timeout);
     }
 
     listen(topic) {
-        return new Promise((resolve, reject)=> {
+        return new Promise((resolve, reject) => {
             if (!topic)return reject(new Error('topic can not be a falsy value.'));
 
-            if (this._ws.readyState !== WebSocket.CONNECTING)this._connect();
+            if (this._ws.readyState !== WebSocket.CONNECTING) this._connect();
 
             var nonce = shortid.generate();
             this._pending[nonce] = {
-                resolve: ()=> {
-                    if (Array.isArray(topic)) topic.map(t=>this._topics.push(t));
+                resolve: () => {
+                    if (Array.isArray(topic)) topic.map(t => this._topics.push(t));
                     else this._topics.push(topic);
                     resolve();
                 }, reject
@@ -128,7 +128,7 @@ class TwitchPubSub extends EventEmitter {
                     topics: Array.isArray(topic) ? topic : [topic]
                 }
             }));
-            setTimeout(()=> {
+            setTimeout(() => {
                 this._pending[nonce].reject('timeout');
                 delete this._pending[nonce];
             }, 10000);
@@ -136,15 +136,15 @@ class TwitchPubSub extends EventEmitter {
     }
 
     unlisten(topic) {
-        return new Promise((resolve, reject)=> {
+        return new Promise((resolve, reject) => {
             if (!topic)return reject(new Error('topic can not be a falsy value.'));
 
-            if (this._ws.readyState !== WebSocket.CONNECTING)this._connect();
+            if (this._ws.readyState !== WebSocket.CONNECTING) this._connect();
 
             var nonce = shortid.generate();
             this._pending[nonce] = {
-                resolve: ()=> {
-                    if (Array.isArray(topic)) topic.map(t=> {
+                resolve: () => {
+                    if (Array.isArray(topic)) topic.map(t => {
                         var index = this._topics.indexOf(t);
                         if (index != -1) {
                             this._topics.splice(index, 1);
@@ -167,7 +167,7 @@ class TwitchPubSub extends EventEmitter {
                     topics: Array.isArray(topic) ? topic : [topic]
                 }
             }));
-            setTimeout(()=> {
+            setTimeout(() => {
                 this._pending[nonce].reject('timeout');
                 delete this._pending[nonce];
             }, 10000);
@@ -182,7 +182,7 @@ class TwitchPubSub extends EventEmitter {
     }
 
     static topic(type, channel) {
-        return `${TwitchPubSub.TOPICS[type]}.${channel}`;
+        return `${TwitchPubSub.TOPICS[type] || type}.${channel}`;
     }
 }
 
