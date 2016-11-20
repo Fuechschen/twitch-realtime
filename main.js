@@ -15,6 +15,8 @@ class TwitchPubSub extends EventEmitter {
         this._pending = {};
         this._initial = null;
         this._tries = 0;
+        this._pingInterval = null;
+        this._pingTimeout = null;
         this._topics = options.defaultTopics;
 
         this._connect();
@@ -41,6 +43,10 @@ class TwitchPubSub extends EventEmitter {
                 }, 1000 * this._tries);
                 this._tries++;
             }
+            clearInterval(this._pingInterval);
+            clearTimeout(this._pingTimeout);
+            this._pingInterval = null;
+            this._pingTimeout = null;
             this.emit('close', this._autoreconnect);
         });
 
@@ -86,7 +92,10 @@ class TwitchPubSub extends EventEmitter {
                     } else if (topic.includes('whispers')) {
                         //todo
                     }
-                } else if (msg.type === 'PING') this._ws.send(JSON.stringify({type: 'PONG'}));
+                } else if (msg.type === 'PONG') {
+                    clearTimeout(this._pingTimeout);
+                    this._pingTimeout = null;
+                }
                 else if (msg.type === 'RECONNECT') this._reconnect();
                 else this.emit('warn', 'Received unknown message type. Maybe this package is outdated?');
             } catch (e) {
@@ -94,6 +103,13 @@ class TwitchPubSub extends EventEmitter {
                 this.emit('warn', 'Failed to parse websocket message', msg);
             }
         });
+
+        this._pingInterval = setInterval(() => {
+            if (this._ws.readyState === WebSocket.OPEN) {
+                this._ws.send(JSON.stringify({type: 'PING'}));
+                this._pingTimeout = setTimeout(() => this._reconnect(1000), 15000);
+            }
+        }, 300000);
     }
 
     _reconnect(timeout) {
@@ -151,7 +167,7 @@ class TwitchPubSub extends EventEmitter {
                             this._topics.splice(index, 1);
                         }
                     };
-                    if(Array.isArray(topic))topic.map(removeTopic);
+                    if (Array.isArray(topic)) topic.map(removeTopic);
                     else removeTopic(topic);
                     resolve();
                     delete this._pending[nonce];
