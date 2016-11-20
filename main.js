@@ -1,7 +1,7 @@
-var WebSocket = require('ws');
-var shortid = require('shortid');
-var Promise = require('bluebird');
-var EventEmitter = require('events');
+var WebSocket = require('ws'),
+    shortid = require('shortid'),
+    Promise = require('bluebird'),
+    EventEmitter = require('events');
 
 var URL = 'wss://pubsub-edge.twitch.tv';
 
@@ -21,7 +21,7 @@ class TwitchPubSub extends EventEmitter {
     }
 
     _connect() {
-        if (this._ws && (this._ws.readyState === WebSocket.CONNECTED || this._ws.readyState === WebSocket.CONNECTING))return;
+        if (this._ws && (this._ws.readyState === WebSocket.OPEN || this._ws.readyState === WebSocket.CONNECTING))return;
         this._ws = new WebSocket(URL);
 
         this._ws.on('open', () => {
@@ -107,15 +107,20 @@ class TwitchPubSub extends EventEmitter {
         return new Promise((resolve, reject) => {
             if (!topic)return reject(new Error('topic can not be a falsy value.'));
 
-            if (this._ws.readyState !== WebSocket.CONNECTING) this._connect();
+            if (this._ws.readyState !== WebSocket.OPEN) this._connect();
 
             var nonce = shortid.generate();
             this._pending[nonce] = {
                 resolve: () => {
                     if (Array.isArray(topic)) topic.map(t => this._topics.push(t));
                     else this._topics.push(topic);
+                    delete this._pending[nonce];
                     resolve();
-                }, reject
+                },
+                reject: (err) => {
+                    reject(err);
+                    delete this._pending[nonce];
+                }
             };
             this._ws.send(JSON.stringify({
                 type: 'LISTEN',
@@ -126,8 +131,7 @@ class TwitchPubSub extends EventEmitter {
                 }
             }));
             setTimeout(() => {
-                this._pending[nonce].reject('timeout');
-                delete this._pending[nonce];
+                if (this._pending[nonce]) this._pending[nonce].reject('timeout');
             }, 10000);
         });
     }
@@ -136,25 +140,26 @@ class TwitchPubSub extends EventEmitter {
         return new Promise((resolve, reject) => {
             if (!topic)return reject(new Error('topic can not be a falsy value.'));
 
-            if (this._ws.readyState !== WebSocket.CONNECTING) this._connect();
+            if (this._ws.readyState !== WebSocket.OPEN) this._connect();
 
             var nonce = shortid.generate();
             this._pending[nonce] = {
                 resolve: () => {
-                    if (Array.isArray(topic)) topic.map(t => {
+                    var removeTopic = (t) => {
                         var index = this._topics.indexOf(t);
                         if (index != -1) {
                             this._topics.splice(index, 1);
                         }
-                    });
-                    else {
-                        var index = this._topics.indexOf(topic);
-                        if (index != -1) {
-                            this._topics.splice(index, 1);
-                        }
-                    }
+                    };
+                    if(Array.isArray(topic))topic.map(removeTopic);
+                    else removeTopic(topic);
                     resolve();
-                }, reject
+                    delete this._pending[nonce];
+                },
+                reject: (err) => {
+                    reject(err);
+                    delete this._pending[nonce];
+                }
             };
             this._ws.send(JSON.stringify({
                 type: 'UNLISTEN',
@@ -165,8 +170,7 @@ class TwitchPubSub extends EventEmitter {
                 }
             }));
             setTimeout(() => {
-                this._pending[nonce].reject('timeout');
-                delete this._pending[nonce];
+                if (this._pending[nonce]) this._pending[nonce].reject('timeout');
             }, 10000);
         });
     }
