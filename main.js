@@ -92,15 +92,15 @@ class TwitchPubSub extends EventEmitter {
                         //todo
                     } else if (topic === 'channel-bitsevents') {
                         this.emit('bits', {
-			    user_name: msg.data.message.user_name,
-			    channel_name: msg.data.message.channel_name,
-			    time: msg.data.message.time,
-			    chat_message: msg.data.message.chat_message,
-			    bits_used: msg.data.message.bits_used,
-			    total_bits_used: msg.data.message.bits_used,
-			    context: msg.data.message.context
-			});
-		    }
+                            user_name: msg.data.message.user_name,
+                            channel_name: msg.data.message.channel_name,
+                            time: msg.data.message.time,
+                            chat_message: msg.data.message.chat_message,
+                            bits_used: msg.data.message.bits_used,
+                            total_bits_used: msg.data.message.bits_used,
+                            context: msg.data.message.context
+                        });
+                    }
                 } else if (msg.type === 'PONG') {
                     clearTimeout(this._pingTimeout);
                     this._pingTimeout = null;
@@ -128,9 +128,19 @@ class TwitchPubSub extends EventEmitter {
         }, timeout);
     }
 
-    listen(topic) {
+    _requiresAuth(topic) {
+        return ['channel-bitsevents'].includes(topic.split('.')[0]);
+    }
+
+    listen(topic, token) {
         return new Promise((resolve, reject) => {
             if (!topic)return reject(new Error('topic can not be a falsy value.'));
+
+            if (Array.isArray(topic)) {
+                for (var t of topic) {
+                    if (this._requiresAuth(topic) && (!this._token || !token))return reject(new Error('this topic requires an authentication'));
+                }
+            } else if (this._requiresAuth(topic) && (!this._token || !token))return reject(new Error('this topic requires an authentication'));
 
             if (this._ws.readyState !== WebSocket.OPEN) this._connect();
 
@@ -151,7 +161,7 @@ class TwitchPubSub extends EventEmitter {
                 type: 'LISTEN',
                 nonce,
                 data: {
-                    auth_token: this._token,
+                    auth_token: token || this._token,
                     topics: Array.isArray(topic) ? topic : [topic]
                 }
             }));
@@ -204,7 +214,7 @@ class TwitchPubSub extends EventEmitter {
         return {
             WHISPERS: 'whispers',
             VIDEOPLAYBACK: 'video-playback',
-	    BITS: 'channel-bitsevents'
+            BITS: 'channel-bitsevents'
         };
     }
 

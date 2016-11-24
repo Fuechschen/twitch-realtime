@@ -40,9 +40,29 @@ realtime.on('viewcount',(data)=>{
     */
 });
 
+realtime.on('bits',(data)=>{
+    /*do stuff
+          { user_name: 'username', //username of bits cheerer
+            channel_name: 'channel', //channel which user cheered
+            time: 123456, //server time of donation
+            chat_message: 'Message', //message sent with bits cheer
+            bits_used: 123, //amount cheered by user
+            total_bits_used: 9999, //total amount cheered ever by user to this specific channel
+            context: 'cheer'  //context of cheer
+          }
+    */
+});
+
 //subscribe to a new topic
 realtime.listen(Realtime.topic(Realtime.TOPICS.VIDEOPLAYBACK,'another-channel'));
 
 //unsubscribe from a topic
 realtime.unlisten(Realtime.topic(Realtime.TOPICS.VIDEOPLAYBACK,'another-channel'));
 ```
+
+You can listen on the following topics:
+
+|Topic|Description|Constant|Requires Token|
+|---|---|---|---|
+|Videoplayback|get updates about stream status and viewcounts|Realtime.TOPICS.VIDEOPLAYBACK|No|
+|Bits|get updates about the Bits on the chat|Realtime.TOPICS.BITS|Yes|
