@@ -18,7 +18,6 @@ class TwitchPubSub extends EventEmitter {
         this._pingInterval = null;
         this._pingTimeout = null;
         this._topics = options.defaultTopics;
-
         this._connect();
     }
 
@@ -91,7 +90,17 @@ class TwitchPubSub extends EventEmitter {
                         }
                     } else if (topic.includes('whispers')) {
                         //todo
-                    }
+                    } else if (topic === 'channel-bitsevents') {
+                        this.emit('bits', {
+			    user_name: msg.data.message.user_name,
+			    channel_name: msg.data.message.channel_name,
+			    time: msg.data.message.time,
+			    chat_message: msg.data.message.chat_message,
+			    bits_used: msg.data.message.bits_used,
+			    total_bits_used: msg.data.message.bits_used,
+			    context: msg.data.message.context
+			});
+		    }
                 } else if (msg.type === 'PONG') {
                     clearTimeout(this._pingTimeout);
                     this._pingTimeout = null;
@@ -194,7 +203,8 @@ class TwitchPubSub extends EventEmitter {
     static get TOPICS() {
         return {
             WHISPERS: 'whispers',
-            VIDEOPLAYBACK: 'video-playback'
+            VIDEOPLAYBACK: 'video-playback',
+	    BITS: 'channel-bitsevents'
         };
     }
 
