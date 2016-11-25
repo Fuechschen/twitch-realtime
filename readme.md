@@ -53,6 +53,26 @@ realtime.on('bits',(data)=>{
     */
 });
 
+realtime.on('whisper',(data)=>{
+    /*do stuff
+        { id: 41,  //message id
+          content: 'foo', //message content
+          thread: '123_456', //conversation id
+          sender: {
+            id: 123456,  //userid
+            username: 'monstercat',  //loginname
+            display_name: 'Monstercat', //username displayed in chat
+            color: '#123456',  //chatcolor
+            badges: [...],  //array of badge-objects {"id":"turbo","version":1}
+            emotes: [...]   //array of emotes
+          },
+          recipient: {...},  //see sender-object
+          send_ts: 123456798,  //?
+          nonce: 'lkshfkjhasdfsdf' //Unique string only used for this message
+        }
+     */
+});
+
 //subscribe to a new topic
 realtime.listen(Realtime.topic(Realtime.TOPICS.VIDEOPLAYBACK,'another-channel'));
 
@@ -66,3 +86,4 @@ You can listen on the following topics:
 |---|---|---|---|
 |Videoplayback|get updates about stream status and viewcounts|Realtime.TOPICS.VIDEOPLAYBACK|No|
 |Bits|get updates about the Bits on the chat|Realtime.TOPICS.BITS|Yes|
+|Whispers|Get incoming whispers|Realtime.TOPICS.WHISPERS|Yes|

@@ -1,11 +1,13 @@
-var WebSocket = require('ws'),
+//noinspection SpellCheckingInspection
+let WebSocket = require('ws'),
     shortid = require('shortid'),
     Promise = require('bluebird'),
     EventEmitter = require('events');
 
-var URL = 'wss://pubsub-edge.twitch.tv';
+const URL = 'wss://pubsub-edge.twitch.tv';
 
 class TwitchPubSub extends EventEmitter {
+    /** @namespace msg.data.message.server_time */
     constructor(options = {reconnect: true, defaultTopics: [], authToken: null}) {
         super();
         if (options.defaultTopics.length < 1)throw new Error('missing default topic');
@@ -65,9 +67,9 @@ class TwitchPubSub extends EventEmitter {
                         } else this.emit('warn', 'Received message for unknown nonce.');
                     }
                 } else if (msg.type === 'MESSAGE') {
-                    var split = msg.data.topic.split('.');
-                    var topic = split[0];
-                    var channel = split[1];
+                    let split = msg.data.topic.split('.'),
+                        topic = split[0],
+                        channel = split[1];
                     if (typeof msg.data.message === 'string') msg.data.message = JSON.parse(msg.data.message);
                     if (topic === 'video-playback') {
                         if (msg.data.message.type === 'stream-up') {
@@ -81,25 +83,49 @@ class TwitchPubSub extends EventEmitter {
                                 time: msg.data.message.server_time,
                                 channel
                             });
-                        } else if (msg.data.message.type === 'viewcount') {
-                            this.emit('viewcount', {
-                                time: msg.data.message.server_time,
-                                channel,
-                                viewers: msg.data.message.viewers
-                            });
+                        } else { //noinspection SpellCheckingInspection
+                            if (msg.data.message.type === 'viewcount') {
+                                //noinspection SpellCheckingInspection
+                                this.emit('viewcount', {
+                                    time: msg.data.message.server_time,
+                                    channel,
+                                    viewers: msg.data.message.viewers
+                                });
+                            }
                         }
                     } else if (topic.includes('whispers')) {
-                        //todo
-                    } else if (topic === 'channel-bitsevents') {
-                        this.emit('bits', {
-                            user_name: msg.data.message.user_name,
-                            channel_name: msg.data.message.channel_name,
-                            time: msg.data.message.time,
-                            chat_message: msg.data.message.chat_message,
-                            bits_used: msg.data.message.bits_used,
-                            total_bits_used: msg.data.message.bits_used,
-                            context: msg.data.message.context
-                        });
+                        /** @namespace msg.data.message.tags */
+                        /** @namespace msg.data.message.from_id */
+                        /** @namespace msg.data.message.tags.login */
+                        /** @namespace msg.data.message.thread_id */
+                        this.emit('whisper', {
+                            id: msg.data.message.data.id,
+                            content: msg.data.message.body,
+                            thread: msg.data.message.thread_id,
+                            sender: {
+                                id: msg.data.message.from_id,
+                                username: msg.data.message.tags.login,
+                                display_name: msg.data.message.tags.display_name,
+                                color: msg.data.message.tags.color,
+                                badges: msg.data.message.tags.badges,
+                                emotes: msg.data.message.tags.emotes
+                            },
+                            recipient: msg.data.message.recipient,
+                            send_ts: msg.data.message.send_ts,
+                            nonce: msg.data.message.nonce
+                        })
+                    } else { //noinspection SpellCheckingInspection
+                        if (topic === 'channel-bitsevents') {
+                            this.emit('bits', {
+                                user_name: msg.data.message.user_name,
+                                channel_name: msg.data.message.channel_name,
+                                time: msg.data.message.time,
+                                chat_message: msg.data.message.chat_message,
+                                bits_used: msg.data.message.bits_used,
+                                total_bits_used: msg.data.message.bits_used,
+                                context: msg.data.message.context
+                            });
+                        }
                     }
                 } else if (msg.type === 'PONG') {
                     clearTimeout(this._pingTimeout);
@@ -128,23 +154,27 @@ class TwitchPubSub extends EventEmitter {
         }, timeout);
     }
 
+    //noinspection JSMethodCanBeStatic
     _requiresAuth(topic) {
-        return ['channel-bitsevents'].includes(topic.split('.')[0]);
+        //noinspection SpellCheckingInspection
+        return ['channel-bitsevents', 'whispers'].includes(topic.split('.')[0]);
     }
 
     listen(topic, token) {
         return new Promise((resolve, reject) => {
-            if (!topic)return reject(new Error('topic can not be a falsy value.'));
+            if (!topic) { //noinspection SpellCheckingInspection
+                return reject(new Error('topic can not be a falsy value.'));
+            }
 
             if (Array.isArray(topic)) {
-                for (var t of topic) {
-                    if (this._requiresAuth(topic) && (!this._token || !token))return reject(new Error('this topic requires an authentication'));
+                for (let t of topic) {
+                    if (this._requiresAuth(t) && (!this._token || !token))return reject(new Error('this topic requires an authentication'));
                 }
             } else if (this._requiresAuth(topic) && (!this._token || !token))return reject(new Error('this topic requires an authentication'));
 
             if (this._ws.readyState !== WebSocket.OPEN) this._connect();
 
-            var nonce = shortid.generate();
+            let nonce = shortid.generate();
             this._pending[nonce] = {
                 resolve: () => {
                     if (Array.isArray(topic)) topic.map(t => this._topics.push(t));
@@ -171,17 +201,20 @@ class TwitchPubSub extends EventEmitter {
         });
     }
 
+    //noinspection SpellCheckingInspection
     unlisten(topic) {
         return new Promise((resolve, reject) => {
-            if (!topic)return reject(new Error('topic can not be a falsy value.'));
+            if (!topic) { //noinspection SpellCheckingInspection
+                return reject(new Error('topic can not be a falsy value.'));
+            }
 
             if (this._ws.readyState !== WebSocket.OPEN) this._connect();
 
-            var nonce = shortid.generate();
+            let nonce = shortid.generate();
             this._pending[nonce] = {
                 resolve: () => {
-                    var removeTopic = (t) => {
-                        var index = this._topics.indexOf(t);
+                    let removeTopic = (t) => {
+                        let index = this._topics.indexOf(t);
                         if (index != -1) {
                             this._topics.splice(index, 1);
                         }
@@ -196,6 +229,7 @@ class TwitchPubSub extends EventEmitter {
                     delete this._pending[nonce];
                 }
             };
+            //noinspection SpellCheckingInspection
             this._ws.send(JSON.stringify({
                 type: 'UNLISTEN',
                 nonce,
@@ -211,6 +245,7 @@ class TwitchPubSub extends EventEmitter {
     }
 
     static get TOPICS() {
+        //noinspection SpellCheckingInspection
         return {
             WHISPERS: 'whispers',
             VIDEOPLAYBACK: 'video-playback',
