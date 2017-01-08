@@ -1,5 +1,5 @@
 # Twitch-Realtime 
-[![NPM version](https://img.shields.io/npm/v/twitch-realtime.svg?style=flat-square)](https://npmjs.com/package/twitch-realtime) [![npm](https://img.shields.io/npm/l/twitch-realtime.svg?style=flat-square)]() [![npm](https://img.shields.io/npm/dm/twitch-reailtime.svg?style=flat-square)]() [![dependencies Status](https://david-dm.org/Fuechschen/twitch-realtime/status.svg?style=flat-square)](https://david-dm.org/Fuechschen/twitch-realtime) [![Build Status](https://travis-ci.org/Fuechschen/twitch-realtime.svg?branch=master)](https://travis-ci.org/Fuechschen/twitch-realtime)
+[![NPM version](https://img.shields.io/npm/v/twitch-realtime.svg?style=flat-square)](https://npmjs.com/package/twitch-realtime) [![npm](https://img.shields.io/npm/l/twitch-realtime.svg?style=flat-square)]() [![npm](https://img.shields.io/npm/dm/twitch-reailtime.svg?style=flat-square)]() [![dependencies Status](https://david-dm.org/Fuechschen/twitch-realtime/status.svg?style=flat-square)](https://david-dm.org/Fuechschen/twitch-realtime) [![Build Status](https://img.shields.io/travis/rust-lang/rust/master.svg?style=flat-square)](https://github.com/Fuechschen/twitch-realtime)
 
 Twitch realtime is a little library to interact with twitch's PubSub-Realtime Api.
 
