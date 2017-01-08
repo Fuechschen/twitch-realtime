@@ -1,6 +1,6 @@
 {
   "name": "twitch-realtime",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "main": "main.js",
   "description": "A small library to use the Twitch PubSub API",
   "author": "Johannes Diehl <johannes@diehl.io> (https://diehl.io)",
