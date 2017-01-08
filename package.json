@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "main": "main.js",
   "description": "A small library to use the Twitch PubSub API",
-  "author": "Johannes Diehl <me@fuechschen.org> (https://fuechschen.org)",
+  "author": "Johannes Diehl <johannes@diehl.io> (https://diehl.io)",
   "keywords": [
     "twitch",
     "realtime",
@@ -25,5 +25,57 @@
     "bluebird": "^3.4.6",
     "shortid": "^2.2.6",
     "ws": "^1.1.1"
+  },
+  "scripts": {
+    "test": "eslint \"**/*.js\"",
+    "docs": "jsdoc main.js"
+  },
+  "eslintConfig": {
+    "env": {
+      "es6": true,
+      "node": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 6
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "semi": [
+        2,
+        "always",
+        {
+          "omitLastInOneLineBlock": true
+        }
+      ],
+      "no-unused-vars": [
+        2,
+        {
+          "argsIgnorePattern": "^_",
+          "caughtErrors": "none"
+        }
+      ],
+      "no-control-regex": 0,
+      "global-require": 1,
+      "camelcase": 0,
+      "dot-notation": 1,
+      "no-else-return": 2,
+      "no-plusplus": 2,
+      "constructor-super": 2,
+      "prefer-arrow-callback": 1,
+      "object-shorthand": 2,
+      "object-curly-spacing": 1,
+      "object-property-newline": [
+        1,
+        {
+          "allowMultiplePropertiesPerLine": true
+        }
+      ],
+      "no-var": 2,
+      "no-inner-declarations": 0
+    }
+  },
+  "devDependencies": {
+    "eslint": "^3.13.0",
+    "jsdoc": "^3.4.3"
   }
 }
