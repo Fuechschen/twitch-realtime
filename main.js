@@ -80,6 +80,7 @@ class TwitchRealtime extends EventEmitter {
         this._ws.on('message', (msg) => {
             try {
                 msg = JSON.parse(msg);
+                //noinspection JSUnresolvedFunction
                 /**
                  * Fired on raw input from twitch
                  * @event TwitchRealtime#raw
@@ -111,6 +112,7 @@ class TwitchRealtime extends EventEmitter {
                     if (typeof msg.data.message === 'string') msg.data.message = JSON.parse(msg.data.message);
                     if (topic === 'video-playback') {
                         if (msg.data.message.type === 'stream-up') {
+                            //noinspection JSUnresolvedVariable
                             /**
                              * Emitted when a stream goes up.
                              * @event TwitchRealtime#stream-up
@@ -126,6 +128,7 @@ class TwitchRealtime extends EventEmitter {
                                 playDelay: msg.data.message.play_delay
                             });
                         } else if (msg.data.message.type === 'stream-down') {
+                            //noinspection JSUnresolvedVariable
                             /**
                              * Emitted when a stream goes down.
                              * @event TwitchRealtime#stream-down
@@ -139,7 +142,7 @@ class TwitchRealtime extends EventEmitter {
                             });
                         } else { //noinspection SpellCheckingInspection
                             if (msg.data.message.type === 'viewcount') {
-                                //noinspection SpellCheckingInspection
+                                //noinspection SpellCheckingInspection,JSUnresolvedVariable
                                 /**
                                  * Emitted when twitch updates the viewcount
                                  * @event TwitchRealtime#viewcount
@@ -308,8 +311,9 @@ class TwitchRealtime extends EventEmitter {
         });
     }
 
+    //noinspection JSUnusedGlobalSymbols
     /**
-     * Unisten to a new topic/ multiple new topics.
+     * Unlisten to a new topic/ multiple new topics.
      * @param {String | Array<String>} topic Either a single topic or an array of topics.
      * @return {Promise} A promise that resolves if the topics were successfully unsubscribed to or rejects if any error occurs.
      */
@@ -361,6 +365,7 @@ class TwitchRealtime extends EventEmitter {
         return this._topics.length;
     }
 
+    //noinspection JSUnusedGlobalSymbols
     get acceptNewTopics() {
         return this.topicCount < 50;
     }
