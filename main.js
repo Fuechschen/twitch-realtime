@@ -6,11 +6,17 @@ let WebSocket = require('ws'),
 
 const URL = 'wss://pubsub-edge.twitch.tv';
 
+/**
+ * Represents a connection to twitch.
+ * @property {Number} topicCount The current count of topics.
+ * @property {Boolean} acceptNewTopics If the connection will accept new topics or not.
+ */
+
 class TwitchRealtime extends EventEmitter {
     /**
      * @constructor
      * @param options Settings for the new Realtime-object
-     * @param  {Array<String>?} options.defaultTopics The first topic to listen to. This is mandatory or twitch will return an error.
+     * @param {Array<String>?} options.defaultTopics The first topic to listen to. This is mandatory or twitch will return an error.
      * @param {Boolean} [options.reconnect=true] Set this to false if you do not want twitch-realtime to automatically reconnect if the connection is lost.
      * @param {String} [options.authToken=null] The default authToken. This is sent for 'listen'-commands if no other token was specified.
      */
@@ -349,6 +355,14 @@ class TwitchRealtime extends EventEmitter {
                 if (this._pending[nonce]) this._pending[nonce].reject('timeout');
             }, 10000);
         });
+    }
+
+    get topicCount() {
+        return this._topics.length;
+    }
+
+    get acceptNewTopics() {
+        return this.topicCount < 50;
     }
 
     /**
