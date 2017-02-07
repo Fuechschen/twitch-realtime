@@ -1,6 +1,6 @@
 {
   "name": "twitch-realtime",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "main": "main.js",
   "description": "A small library to use the Twitch PubSub API",
   "author": "Johannes Diehl <johannes@diehl.io> (https://diehl.io)",
@@ -24,7 +24,7 @@
   "dependencies": {
     "bluebird": "^3.4.6",
     "shortid": "^2.2.6",
-    "ws": "^1.1.1"
+    "ws": "^2.0.2"
   },
   "scripts": {
     "test": "eslint \"**/*.js\"",

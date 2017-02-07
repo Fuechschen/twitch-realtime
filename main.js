@@ -86,7 +86,7 @@ class TwitchRealtime extends EventEmitter {
                  * @event TwitchRealtime#raw
                  * @prop {Object} data Raw data from twitch.
                  */
-                this.emit('raw', Object.clone(msg));
+                this.emit('raw', Object.assign({}, msg));
                 if (msg.type === 'RESPONSE') {
                     if (msg.nonce === this._initial) {
                         this._initial = null;
