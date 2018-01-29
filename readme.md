@@ -1,13 +1,15 @@
 # Twitch-Realtime 
 [![NPM version](https://img.shields.io/npm/v/twitch-realtime.svg?style=flat-square)](https://npmjs.com/package/twitch-realtime) [![npm](https://img.shields.io/npm/l/twitch-realtime.svg?style=flat-square)]() [![npm](https://img.shields.io/npm/dm/twitch-reailtime.svg?style=flat-square)]() [![dependencies Status](https://david-dm.org/Fuechschen/twitch-realtime/status.svg?style=flat-square)](https://david-dm.org/Fuechschen/twitch-realtime) [![Build Status](https://img.shields.io/travis/Fuechschen/twitch-realtime/master.svg?style=flat-square)](https://github.com/Fuechschen/twitch-realtime)
 
+### Warning: This library hasn't been updated for quite some time. It may be outdated and/or inoperational.
+
 Twitch realtime is a little library to interact with twitch's PubSub-Realtime Api.
 
 You can install it with
 
 ```npm install --save twitch-realtime```
 
-Have a look at the [docs](https://fuechschen.me/twitch-realtime/TwitchRealtime.html)
+Have a look at the [docs](https://docs.fuechschen.org/twitch-realtime/TwitchRealtime.html)
 
 You can listen on the following topics:
 
